@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "SVO",
   "license": "MIT",
+  "scripts": {
+    "start": "node server/src/app.js"
+  },
   "devDependencies": {
     "chalk": "^2.4.2"
   },
