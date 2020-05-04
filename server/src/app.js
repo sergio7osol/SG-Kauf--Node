@@ -188,25 +188,70 @@ app.get("/all-files", (req, res) => {
 
 app.get("/all-dates", (req, res) => {
     const buyDirectory = path.join(__dirname, '../data/buys');
-  
+
     fs.readdir(buyDirectory, function (err, files) {
-      let promises = null;
-  
-      if (err) {
-        res.send('Error getting buy file names.');
-      } else {
-        promises = files.map((filename, index) => {
-          return new Promise((resolve, reject) => {
-            resolve(filename);
-          });
-        });
-  
-        Promise.all(promises).then((content) => {
-          res.send(content);
-        })
-      }
+        let promises = null;
+
+        if (err) {
+            res.send('Error getting buy file names.');
+        } else {
+            promises = files.map((filename, index) => {
+                return new Promise((resolve, reject) => {
+                    resolve(filename);
+                });
+            });
+
+            Promise.all(promises).then((content) => {
+                res.send(content);
+            })
+        }
     })
-  });
+});
+
+app.get("/all-date-buys", (req, res) => {
+    const buyDirectory = path.join(__dirname, '../data/buys');
+
+    fs.readdir(buyDirectory, function (err, files) {
+        let promises = null;
+
+        if (err) {
+            res.send('Error getting buy file names.');
+        } else {
+            promises = files.map((filename, index) => {
+                return new Promise((resolve, reject) => {
+                    fs.readFile(`${buyDirectory}/${filename}`, (err, data) => {
+                        let newDataBuyMenu = null; 
+
+                        if (err) throw err;
+                        
+                        data = data.toString('utf-8');
+                        data = JSON.parse(data);
+                        
+                        if (!(data instanceof Array && data.length)) {
+                            reject(new Error('No Array data in fetched request /all-date-buys'));
+                        }
+                        
+                        newDataBuyMenu = data.reduce((acc, v, i) => {
+                            if (!(v instanceof Object)) return false;
+                            
+                            if (i === 0) acc.date = v.date; 
+                            
+                            acc.times.push(v.time);
+
+                            return acc;                            
+                        }, {date: '', times: []});
+
+                        resolve(newDataBuyMenu);
+                    });
+                });
+            });
+
+            Promise.all(promises).then((content) => {
+                res.send(content);
+            })
+        }
+    })
+});
 
 
 app.post("/save-day", cors(), (req, res) => {
