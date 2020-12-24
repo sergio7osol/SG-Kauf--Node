@@ -13,7 +13,7 @@ const geocode = (address, callback  ) => {
       callback("Unable to find location. Try another search", undefined);
     } else {
       placeData = body.features[0];
-
+console.log('remove');
       resultData = {
         latitude: placeData.center[1],
         longitude: placeData.center[0],
